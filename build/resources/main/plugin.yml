@@ -1,9 +1,0 @@
-name: NKLoteria
-version: '1.0-SNAPSHOT'
-main: com.nicolas.nkloteria.Main
-api-version: '1.17'
-load: STARTUP
-
-commands:
-  loteria:
-    description: iniciar o sorteio da loteria
