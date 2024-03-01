@@ -5,7 +5,8 @@ import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitRunnable
 
 class Lottery(
-    private val plugin: Main
+    private val plugin: Main,
+    private val lotteryReward : String
 ) : BukkitRunnable() {
 
     private var countdownSeconds = 100
@@ -37,7 +38,7 @@ class Lottery(
                     .appendLine("§2§lEVENTO LOTERIA COMEÇOU!")
                     .appendLine("§6§l| §fEvento loteria no ar!")
                     .appendLine("§6§l| §fpara apostar utilize o comando §6/loteria <numero>")
-                    .appendLine("§6§l| §fPrêmio estimado: §e§l[4SS]")
+                    .appendLine("§6§l| §fPrêmio estimado: §e§l$lotteryReward")
                     .lines()
 
                 for (i in lines) {

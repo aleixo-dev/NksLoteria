@@ -5,7 +5,8 @@ import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
 class LotteryEventGuess(
-    var player: Player
+    var player: Player,
+    var quantity : String
 ) : Event() {
 
     override fun getHandlers(): HandlerList {

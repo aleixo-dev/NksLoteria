@@ -19,9 +19,11 @@ class LotteryGuessListener(
                 Bukkit.getOnlinePlayers().forEach { player ->
                     val stringBuilder = StringBuilder()
                         .appendLine(" ")
-                        .appendLine("§c§lEVENTO LOTERIA!")
-                        .appendLine("§e§l| §fQue sorte! o jogador §1§l${lotteryEventGuess.player.displayName} §facertou o número da sorte!")
-                        .appendLine("§e§l| §fEvento encerrado")
+                        .appendLine("§2§lEVENTO LOTERIA!")
+                        .appendLine("§e§l| §fQue sorte! o jogador §6${lotteryEventGuess.player.displayName} §facertou o número da sorte!")
+                        .appendLine("§e§l| §fEle recebeu §6${lotteryEventGuess.quantity}")
+                        .appendLine(" ")
+                        .appendLine("§e§l| §fEvento encerrado!")
                         .appendLine(" ")
                         .lines()
 
