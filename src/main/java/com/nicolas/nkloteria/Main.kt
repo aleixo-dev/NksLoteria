@@ -9,6 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin
 class Main : JavaPlugin() {
 
     var lotteryNumber: HashMap<String, Int> = hashMapOf()
+    var lotteryQuantity: HashMap<String, Double> = hashMapOf()
     var magnitudeMap: HashMap<String, Double> = hashMapOf(
         "K" to 1E3,
         "M" to 1E6,
@@ -48,7 +49,7 @@ class Main : JavaPlugin() {
         if (!setupEconomy()) {
             logger.severe(
                 String.format(
-                    "[%s] Plugin foi desabilitador por não encontrar a dependência Vault",
+                    "Plugin foi desabilitador por não encontrar a dependência Vault",
                     description.name
                 )
             )

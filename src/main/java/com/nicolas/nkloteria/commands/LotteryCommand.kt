@@ -17,7 +17,7 @@ class LotteryCommand(
 ) : CommandExecutor {
 
     private val economy: Economy? = Main.getEconomy()
-    private var lottery: Lottery = Lottery(plugin)
+    private var lottery : Lottery? = null
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
 
@@ -35,9 +35,9 @@ class LotteryCommand(
             return false
         }
 
-        if (args.size == 2 && args[0].equals("iniciar", true)) {
+        if (args.size == 3 && args[0].equals("iniciar", true)) {
 
-            if (!args[1].isNumeric()) {
+            if (!args[1].isNumeric() && !args[2].isNumeric()) {
                 LotteryMessages.showHelpCommand().lines().forEach {
                     player.sendMessage(it)
                 }
@@ -45,26 +45,34 @@ class LotteryCommand(
             }
 
             if (!hasLotteryStarted()) {
-                lottery.start()
+
                 plugin.lotteryNumber[LOTTERY_EVENT_KEY] = args[1].toInt()
+                plugin.lotteryQuantity[LOTTERY_EVENT_QUANTITY] = args[2].toDouble()
+
+                /**
+                 * Always when a bukkit runnable is cancel,
+                 * we need to create a new instance
+                 */
+                lottery = Lottery(plugin)
+                lottery?.start()
 
             } else {
-                player.sendMessage("Um número já foi sorteado, espere até encerrar!")
+                player.sendMessage("§eUm número já foi sorteado, espere até encerrar!")
             }
 
         } else if (args.size == 1 && args[0].equals("sorteio", true)) {
 
             if (hasLotteryStarted()) {
-                player.sendMessage("Sorteio ativo:")
-                player.sendMessage("-> Número da loteria : ${plugin.lotteryNumber[LOTTERY_EVENT_KEY] ?: 0}")
+                player.sendMessage("| §eSorteio ativo:")
+                player.sendMessage("| §eNúmero da loteria: §7§l${plugin.lotteryNumber[LOTTERY_EVENT_KEY] ?: 0}")
             } else {
-                player.sendMessage("Não existe sorteio ativo.")
+                player.sendMessage("§4Não existe sorteio ativo.")
             }
 
         } else if (args.size == 1 && args[0].equals("encerrar", true)) {
 
             if (hasLotteryStarted()) {
-                lottery.reset()
+                lottery?.reset()
                 player.sendMessage("Você acabou de encerrar um sorteio.")
             } else {
                 player.sendMessage("Não possui um sorteio ativo")
@@ -72,8 +80,13 @@ class LotteryCommand(
 
         } else if (args.size == 1) {
 
+            if (args[0].equals("iniciar", true)) {
+                player.sendMessage("§eTente usar: /loteria iniciar <número> <quantidade>")
+                return true
+            }
+
             if (!args[0].isNumeric()) {
-                player.sendMessage("Você pode apostar apenas número!")
+                player.sendMessage("§c§lERRO Você pode apostar apenas número!")
                 return false
             }
 
@@ -82,12 +95,18 @@ class LotteryCommand(
                 return false
             }
 
-            val playerLotteryNumber = args[0].toInt()
+            if (economy == null) return true
 
-            if (playerLotteryNumber == plugin.lotteryNumber[LOTTERY_EVENT_KEY]) {
+            if (args[0].toInt() == plugin.lotteryNumber[LOTTERY_EVENT_KEY]) {
+                val response =
+                    economy.depositPlayer(player, plugin.lotteryQuantity[LOTTERY_EVENT_QUANTITY] ?: 0.0)
+                if (response.transactionSuccess()) {
+                    player.sendMessage(String.format("Você recebeu %s", economy.format(response.amount)))
+                }
                 Bukkit.getPluginManager().callEvent(LotteryEventGuess(player))
+                lottery?.reset()
             } else {
-                player.sendMessage("Que pena! você errou.")
+                player.sendMessage("§eQue pena! você errou.")
             }
         }
 
@@ -101,5 +120,6 @@ class LotteryCommand(
 
     companion object {
         const val LOTTERY_EVENT_KEY = "event"
+        const val LOTTERY_EVENT_QUANTITY = "event_quantity"
     }
 }

@@ -59,5 +59,6 @@ class Lottery(
 
     private fun resetLotteryNumber() {
         plugin.lotteryNumber.clear()
+        plugin.lotteryQuantity.clear()
     }
 }

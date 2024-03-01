@@ -4,6 +4,7 @@ main: com.nicolas.nkloteria.Main
 api-version: '1.17'
 load: STARTUP
 depend: [Vault]
+softdepend: [JH_Economy, Essentials]
 
 commands:
   loteria:
