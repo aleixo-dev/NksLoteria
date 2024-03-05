@@ -57,7 +57,7 @@ class Main : JavaPlugin() {
             return
         }
 
-        Bukkit.getConsoleSender().sendMessage("§6[NKLoteria] §7- §e§lAtivo com sucesso!")
+        Bukkit.getConsoleSender().sendMessage("\n\n§6[NKLoteria] §7- §e§lAtivo com sucesso!\n\n")
         getCommand("loteria")?.setExecutor(LotteryCommand(this))
 
         Bukkit.getPluginManager().registerEvents(LotteryGuessListener(this), this)

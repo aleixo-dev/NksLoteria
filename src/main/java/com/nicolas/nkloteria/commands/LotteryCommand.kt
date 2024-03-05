@@ -57,8 +57,8 @@ class LotteryCommand(
                     lotteryRewardQuantity = parseReward(args[2])
 
                     /**
-                     * Always when a bukkit runnable is cancel,
-                     * we need to create a new instance
+                     * Always when a bukkit runnable have been canceled,
+                     * we need to create a new instance.
                      */
                     lottery = Lottery(plugin, plugin.lotteryQuantity[LOTTERY_EVENT_QUANTITY] ?: "")
                     lottery?.start()
