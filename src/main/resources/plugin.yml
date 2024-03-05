@@ -2,9 +2,9 @@ name: NKLoteria
 version: '${version}'
 main: com.nicolas.nkloteria.Main
 api-version: '1.17'
+depend: ["Vault"]
+softdepend: ["NextEconomy", "SolaryEconomy"]
 load: STARTUP
-depend: [Vault]
-softdepend: [NextEconomy, Essentials]
 
 commands:
   loteria:

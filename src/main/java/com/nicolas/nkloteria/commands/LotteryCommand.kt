@@ -89,7 +89,7 @@ class LotteryCommand(
         } else if (args.size == 1) {
 
             if (args[0].equals("iniciar", true)) {
-                player.sendMessage("§eTente usar /loteria iniciar <número> <quantidade>")
+                player.sendMessage("${LotteryMessages.pluginTag()}§7Tente usar /loteria iniciar (número) (prêmio)")
                 return true
             }
 

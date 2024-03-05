@@ -1,12 +1,13 @@
 package com.nicolas.nkloteria.instance
 
 import com.nicolas.nkloteria.Main
+import com.nicolas.nkloteria.utils.LotteryMessages
 import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitRunnable
 
 class Lottery(
     private val plugin: Main,
-    private val lotteryReward : String
+    private val lotteryReward: String
 ) : BukkitRunnable() {
 
     private var countdownSeconds = 100
@@ -35,10 +36,12 @@ class Lottery(
             Bukkit.getOnlinePlayers().forEach { players ->
                 val lines = StringBuilder()
                     .appendLine(" ")
-                    .appendLine("§2§lEVENTO LOTERIA COMEÇOU!")
-                    .appendLine("§6§l| §fEvento loteria no ar!")
-                    .appendLine("§6§l| §fpara apostar utilize o comando §6/loteria <numero>")
-                    .appendLine("§6§l| §fPrêmio estimado: §e§l$lotteryReward")
+                    .appendLine("§a§lEVENTO LOTERIA COMEÇOU!")
+                    .appendLine(" ")
+                    .appendLine("§6§l| §fEvento loteria ativo agora!")
+                    .appendLine("§6§l| §fBasta usar §a/loteria (número) para apostar")
+                    .appendLine("§6§l| §fPrêmio estimado: §e§lR$[$lotteryReward]")
+                    .appendLine(" ")
                     .lines()
 
                 for (i in lines) {
@@ -51,7 +54,14 @@ class Lottery(
 
         if (countdownSeconds <= 1) {
             for (player in Bukkit.getOnlinePlayers()) {
-                player.sendMessage("Evento loteria encerrada!")
+                StringBuilder()
+                    .appendLine(" ")
+                    .appendLine("${LotteryMessages.pluginTag()}§6Evento loteria encerrado, não houve ganhador")
+                    .appendLine(" ")
+                    .lines()
+                    .forEach { t ->
+                        player.sendMessage(t)
+                    }
             }
         }
         countdownSeconds--
