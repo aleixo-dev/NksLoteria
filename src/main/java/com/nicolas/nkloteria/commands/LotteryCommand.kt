@@ -50,6 +50,14 @@ class LotteryCommand(
             if (!hasLotteryStarted()) {
 
                 plugin.lotteryNumber[LOTTERY_EVENT_KEY] = args[1].toInt()
+
+                val charZero = args[2].toCharArray()
+                if (charZero.contentToString()[0] == '0') {
+                    LotteryMessages.showHelpCommand().lines().forEach { message ->
+                        player.sendMessage(message)
+                    }
+                    return true
+                }
                 plugin.lotteryQuantity[LOTTERY_EVENT_QUANTITY] = args[2]
 
                 if (endsWithMagnitude(args[2])) {
