@@ -3,8 +3,7 @@ package com.nicolas.nkloteria.commands
 import com.nicolas.nkloteria.Main
 import com.nicolas.nkloteria.event.LotteryEventGuess
 import com.nicolas.nkloteria.instance.Lottery
-import com.nicolas.nkloteria.utils.LotteryMessages
-import com.nicolas.nkloteria.utils.isNumeric
+import com.nicolas.nkloteria.utils.*
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
@@ -19,6 +18,7 @@ class LotteryCommand(
     private val economy: Economy? = Main.getEconomy()
     private var lottery: Lottery? = null
     private var lotteryRewardQuantity: Double = 0.0
+    private val rewardUtil = RewardUtil(plugin)
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
 
@@ -30,76 +30,75 @@ class LotteryCommand(
         if (economy == null) return true
         val player: Player = sender
 
-        if (args.isEmpty()) {
+        if (args.isEmpty() && player.hasPermissionAdmin()) {
             LotteryMessages.showHelpCommand().lines().forEach {
                 player.sendMessage(it)
             }
             return true
         }
 
-        if (args.size == 3 && args[0].equals("iniciar", true)) {
+        if (player.hasPermissionAdmin()) {
+            if (args.size == 3 && args[0].equals("iniciar", true)) {
 
-            if (!args[1].isNumeric() || (!isValidMagnitudeMap((args[2])) || args[2].isBlank())) {
-                LotteryMessages.showHelpCommand().lines().forEach {
-                    player.sendMessage(it)
-                }
-
-                return true
-            }
-
-            if (!hasLotteryStarted()) {
-
-                plugin.lotteryNumber[LOTTERY_EVENT_KEY] = args[1].toInt()
-
-                val charZero = args[2].toCharArray()
-                if (charZero.contentToString()[0] == '0') {
-                    LotteryMessages.showHelpCommand().lines().forEach { message ->
-                        player.sendMessage(message)
+                if (!args[1].isNumeric() || (!rewardUtil.isValidMagnitudeMap((args[2])) || args[2].isBlank())) {
+                    LotteryMessages.showHelpCommand().lines().forEach {
+                        player.sendMessage(it)
                     }
+
                     return true
                 }
-                plugin.lotteryQuantity[LOTTERY_EVENT_QUANTITY] = args[2]
 
-                if (endsWithMagnitude(args[2])) {
+                if (!hasLotteryStarted()) {
 
-                    lotteryRewardQuantity = parseReward(args[2])
+                    if (args[2].toCharArray()[0] == '0') {
+                        LotteryMessages.showHelpCommand().lines().forEach { message ->
+                            player.sendMessage(message)
+                        }
+                        return true
+                    }
 
-                    /**
-                     * Always when a bukkit runnable have been canceled,
-                     * we need to create a new instance.
-                     */
-                    lottery = Lottery(plugin, plugin.lotteryQuantity[LOTTERY_EVENT_QUANTITY] ?: "")
-                    lottery?.start()
+                    plugin.lotteryNumber[LOTTERY_EVENT_KEY] = args[1].toInt()
+                    plugin.lotteryQuantity[LOTTERY_EVENT_QUANTITY] = args[2]
+
+                    if (rewardUtil.endsWithMagnitude(args[2])) {
+
+                        lotteryRewardQuantity = rewardUtil.parseReward(args[2])
+
+                        /**
+                         * Always when a bukkit runnable have been canceled,
+                         * we need to create a new instance.
+                         */
+                        lottery = Lottery(plugin, plugin.lotteryQuantity[LOTTERY_EVENT_QUANTITY] ?: "")
+                        lottery?.start()
+                    }
+
+                } else {
+                    player.sendMessage("§eUm número já foi sorteado, espere até encerrar!")
                 }
 
+            } else if (args.size == 1 && args[0].equals("sorteio", true)) {
+
+                if (hasLotteryStarted()) {
+                    player.sendMessage("| §eSorteio ativo:")
+                    player.sendMessage("| §eNúmero da loteria: §7§l${plugin.lotteryNumber[LOTTERY_EVENT_KEY] ?: 0}")
+                } else {
+                    player.sendMessage("§eNão existe sorteio ativo.")
+                }
+
+            } else if (args.size == 1 && args[0].equals("encerrar", true) && player.hasPermission("niks.loteria.*")) {
+
+                if (hasLotteryStarted()) {
+                    lottery?.reset()
+                    player.sendMessage("§eVocê acabou de encerrar um sorteio.")
+                } else {
+                    player.sendMessage("§eNão possui um sorteio ativo")
+                }
             } else {
-                player.sendMessage("§eUm número já foi sorteado, espere até encerrar!")
-            }
-
-        } else if (args.size == 1 && args[0].equals("sorteio", true)) {
-
-            if (hasLotteryStarted()) {
-                player.sendMessage("| §eSorteio ativo:")
-                player.sendMessage("| §eNúmero da loteria: §7§l${plugin.lotteryNumber[LOTTERY_EVENT_KEY] ?: 0}")
-            } else {
-                player.sendMessage("§eNão existe sorteio ativo.")
-            }
-
-        } else if (args.size == 1 && args[0].equals("encerrar", true)) {
-
-            if (hasLotteryStarted()) {
-                lottery?.reset()
-                player.sendMessage("§eVocê acabou de encerrar um sorteio.")
-            } else {
-                player.sendMessage("§eNão possui um sorteio ativo")
-            }
-
-        } else if (args.size == 1) {
-
-            if (args[0].equals("iniciar", true)) {
                 player.sendMessage("${LotteryMessages.pluginTag()}§7Tente usar /loteria iniciar (número) (prêmio)")
                 return true
             }
+
+        } else if (args.size == 1 && player.hasPermissionBet()) {
 
             if (!args[0].isNumeric()) {
                 player.sendMessage("§eVocê pode apostar apenas número!")
@@ -112,18 +111,7 @@ class LotteryCommand(
             }
 
             if (args[0].toInt() == plugin.lotteryNumber[LOTTERY_EVENT_KEY]) {
-                val response =
-                    economy.depositPlayer(player, lotteryRewardQuantity)
-
-                if (response.transactionSuccess()) {
-
-                    player.sendMessage(
-                        String.format(
-                            "§b§lEVENTO §eVocê recebeu %s",
-                            plugin.lotteryQuantity[LOTTERY_EVENT_QUANTITY]
-                        )
-                    )
-                }
+                economy.depositPlayer(player, lotteryRewardQuantity)
 
                 Bukkit.getPluginManager()
                     .callEvent(LotteryEventGuess(player, plugin.lotteryQuantity[LOTTERY_EVENT_QUANTITY] ?: ""))
@@ -133,9 +121,7 @@ class LotteryCommand(
                 player.sendMessage("§eQue pena! você errou.")
             }
         } else {
-            LotteryMessages.showHelpCommand().lines().forEach {
-                player.sendMessage(it)
-            }
+            LotteryMessages.messageErrorPermission(player)
         }
 
         return true
@@ -143,54 +129,6 @@ class LotteryCommand(
 
     private fun hasLotteryStarted(): Boolean {
         return plugin.lotteryNumber.containsKey(LOTTERY_EVENT_KEY)
-    }
-
-    private fun endsWithMagnitude(reward: String): Boolean {
-        for (magnitude in plugin.magnitudeMap.keys) {
-            if (reward.endsWith(magnitude)) {
-                return true
-            }
-        }
-        return false
-    }
-
-    private fun parseReward(reward: String): Double {
-
-        for ((key, _) in plugin.magnitudeMap) {
-            val regex = Regex("""(\d{1,3})($key{1,3})""")
-            val matchResult = regex.find(reward)
-
-            if (matchResult != null && matchResult.value == reward) {
-
-                val (numberPart, abbreviationNumber) = matchResult.destructured
-                if (plugin.magnitudeMap.containsKey(abbreviationNumber)) {
-
-                    val magnitudeMultiplier = plugin.magnitudeMap[abbreviationNumber]!!
-                    val number = numberPart.toDouble()
-
-                    return number * magnitudeMultiplier
-                }
-            }
-        }
-
-        return try {
-            reward.toDouble()
-        } catch (e: NumberFormatException) {
-            0.0
-        }
-    }
-
-    private fun isValidMagnitudeMap(input: String): Boolean {
-        for ((key, _) in plugin.magnitudeMap) {
-            val regex = Regex("""(\d{1,3})($key{1,3})""")
-            val matchResult = regex.find(input)
-
-            if (matchResult != null && matchResult.value == input) {
-                return true
-            }
-        }
-
-        return false
     }
 
     companion object {

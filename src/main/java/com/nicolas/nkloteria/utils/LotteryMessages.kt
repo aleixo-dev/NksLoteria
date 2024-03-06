@@ -1,5 +1,6 @@
 package com.nicolas.nkloteria.utils
 
+import org.bukkit.entity.Player
 import java.lang.StringBuilder
 
 object LotteryMessages {
@@ -22,13 +23,7 @@ object LotteryMessages {
             .append("§a§lNiksLoteria §8➡ ")
     }
 
-    fun showLotteryStart(isAdmin: Boolean): StringBuilder {
-        return if (isAdmin) {
-            StringBuilder()
-                .append("")
-
-        } else {
-            StringBuilder()
-        }
+    fun messageErrorPermission(player: Player) {
+        player.sendMessage("§c Você não tem permissão para esse comando")
     }
 }
