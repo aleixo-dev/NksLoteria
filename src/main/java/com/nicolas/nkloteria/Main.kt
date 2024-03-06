@@ -57,15 +57,22 @@ class Main : JavaPlugin() {
             return
         }
 
-        Bukkit.getConsoleSender().sendMessage("\n\n§6[NKLoteria] §7- §e§lAtivo com sucesso!\n\n")
+        Bukkit.getConsoleSender().sendMessage("§a[NKLoteria] §7- §alPlugin ativo")
         getCommand("loteria")?.setExecutor(LotteryCommand(this))
-
         Bukkit.getPluginManager().registerEvents(LotteryGuessListener(this), this)
+
+        /**
+         * load/create config.yml file
+         */
+
+        saveDefaultConfig()
+
     }
 
     override fun onDisable() {
         lotteryNumber.clear()
         magnitudeMap.clear()
+        lotteryQuantity.clear()
     }
 
     private fun setupEconomy(): Boolean {
