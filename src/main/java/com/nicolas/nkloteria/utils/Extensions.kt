@@ -1,5 +1,10 @@
 package com.nicolas.nkloteria.utils
 
-fun String.isNumeric() : Boolean {
+import org.bukkit.entity.Player
+
+fun String.isNumeric(): Boolean {
     return this.all { it.isDigit() }
 }
+
+fun Player.hasPermissionAdmin() = hasPermission(PluginPermission.Admin.permission)
+fun Player.hasPermissionBet() = hasPermission(PluginPermission.Bet.permission)
