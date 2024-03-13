@@ -1,14 +1,11 @@
 package com.nicolas.nkloteria.utils
 
-import org.bukkit.entity.Player
-import java.lang.StringBuilder
-
 object LotteryMessages {
 
     fun showHelpCommand(): StringBuilder {
         return StringBuilder()
             .appendLine(" ")
-            .appendLine("§a§lNiksLoteria §8➡ §fAjuda")
+            .appendLine("§a§lNksLoteria §8➡ §fAjuda")
             .appendLine(" ")
             .appendLine("§a/loteria iniciar (numero) (prêmio) §8- §7Iniciar o sorteio com um dado número e prêmio")
             .appendLine("§a/loteria (numero) §8- §7Apostar em um número")
@@ -17,13 +14,4 @@ object LotteryMessages {
             .appendLine(" ")
     }
 
-
-    fun pluginTag(): StringBuilder {
-        return StringBuilder()
-            .append("§a§lNiksLoteria §8➡ ")
-    }
-
-    fun messageErrorPermission(player: Player) {
-        player.sendMessage("§c Você não tem permissão para esse comando")
-    }
 }
