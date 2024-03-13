@@ -60,7 +60,7 @@ kotlin {
 
 shadowJar {
     destinationDirectory.set(file("C:/Users/Nicolas/Desktop/SERVIDOR/SERVIDOR_PAPER/plugins"))
-    archiveBaseName.set('NKLoteria')
+    archiveBaseName.set('NksLoteria')
     archiveClassifier.set('')
     archiveVersion.set('')
 }
