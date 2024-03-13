@@ -1,7 +1,7 @@
-name: NKLoteria
+name: NksLoteria
 version: '${version}'
 main: com.nicolas.nkloteria.Main
-api-version: '1.17'
+api-version: '1.8'
 depend: ["Vault"]
 softdepend: ["NextEconomy", "SolaryEconomy"]
 load: STARTUP
@@ -9,3 +9,7 @@ load: STARTUP
 commands:
   loteria:
     description: iniciar o sorteio da loteria
+    aliases:
+      - lt
+      - lta
+      - ltra
