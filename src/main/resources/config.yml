@@ -1,0 +1,142 @@
+#
+#   _   _ _        _          _            _
+#  | \ | | | _____| |    ___ | |_ ___ _ __(_) __ _
+#  |  \| | |/ / __| |   / _ \| __/ _ | '__| |/ _` |
+#  | |\  |   <\__ | |__| (_) | ||  __| |  | | (_| |
+#  |_| \_|_|\_|___|_____\___/ \__\___|_|  |_|\__,_|
+#
+
+# Configurações relacionadas ao dinheiro do jogador.
+saque:
+  # Define se quando o jogador efetuar uma aposta, deverá tirar dinheiro dele.
+  habilitar: true
+
+  # Define a quantidade de money retirada do jogador após uma aposta, se ativo.
+  # - É importante usar a formatação como: '1K', '10B' ..., tendo como
+  # base três números e letras como máximo: '100B', '999SS' ...
+  valor: '10K'
+
+# Define os prêmios
+# - Caso não queria algum valor já pré definido, basta remover o valor,
+# mas fique ciente que quando dado um prêmio que aqui foi removido, isso não vai funcionar.
+deposito:
+
+  # Lista de valores dos prêmios quando o jogador acertar o número do sorteio.
+  # - É necessário seguir o padrão corretamente, por outro lado, o sistema de deposito
+  # pode não funcionar corretamente.
+  premios:
+    - "K,1E3"
+    - "M,1E6"
+    - "B,1E9"
+    - "T,1E12"
+    - "Q,1E15"
+    - "QQ,1E18"
+    - "S,1E21"
+    - "SS,1E24"
+    - "OC,1E27"
+    - "N,1E30"
+    - "D,1E33"
+    - "UN,1E36"
+    - "DD,1E39"
+    - "TR,1E42"
+    - "QT,1E45"
+    - "QN,1E48"
+    - "SD,1E51"
+    - "SPD,1E54"
+    - "OD,1E57"
+    - "ND,1E60"
+    - "VG,1E63"
+    - "UVG,1E66"
+    - "DVG,1E69"
+    - "TVG,1E72"
+    - "QTV,1E75"
+    - "QNV,1E78"
+    - "SEV,1E81"
+    - "SPV,1E84"
+    - "OVG,1E87"
+    - "NVG,1E90"
+    - "TG,1E93"
+
+#
+#   __  __
+#  |  \/  | ___  ___ ___  __ _  __ _  ___
+#  | |\/| |/ _ \/ __/ __|/ _` |/ _` |/ _ \
+#  | |  | |  __/\__ \__ \ (_| | (_| |  __/
+#  |_|  |_|\___||___/___/\__,_|\__, |\___|
+#                              |___/
+
+# Define mensagens geral do evento.
+mensagens:
+
+  # Define se todas as mensagens do evento devem aparecer.
+  # - Isso vai aparecer para todos os jogadores.
+  habilitar: true
+
+  # Define a mensagem quando o evento começar.
+  inicio:
+    - ''
+    - '&2&lEVENTO LOTERIA COMEÇOU'
+    - ''
+    - '&c&l| &fEvento loteria ativo!'
+    - '&c&l| &fUtilize /loteria (número) para apostar'
+    - '&c&l| &fPrêmio estimado &a[{premio_estimado}]'
+    - ''
+
+  # Define a mensagem quando existir um vencedor.
+  acerto:
+    - ''
+    - '&2&lEVENTO LOTERIA!'
+    - ''
+    - '&c&l| &fQue sorte o &6{apostador} &facertou o número da sorte!'
+    - '&c&l| &fO mesmo recebeu o valor de &a[{premio_quantidade}]'
+    - ''
+    - '&cEvento encerrado'
+    - ''
+
+  # Define a mensagem quando possui evento ativo, somente admins.
+  # - É necessário manter o {numero_loteria} para o número sorteado aparecer.
+  sorteio:
+    - ''
+    - '&c&l| &fSorteio ativo'
+    - '&c&l| &fNúmero da loteria: &a&l[{numero_loteria}]'
+    - ''
+
+  # Define mensagem quando não houver nenhum sorteio ativo
+  nenhum-sorteio-ativo: 'Não possui nenhum sorteio ativo no momento'
+
+  # Define mensagem para admin
+  admin:
+
+    # Define mensagem quando um sorteio foi encerrado
+    sorteio-encerrar: 'Você acabou de finalizar um sorteio'
+
+    #Define mensagem para que quando já tiver um sorteio ativo.
+    numero-ja-sorteado: 'Um número já foi sorteado'
+
+  # Define mensagens para o jogador
+  jogador:
+
+    # Define mensagem quando o jogador tentar apostar qualquer coisa a não ser número
+    erro-na-aposta: 'Você pode apostar apenas número'
+
+    # Define mensagem quando o jogador errou o número sorteado
+    tentativa: 'Que pena, você errou!'
+
+  # Define mensagem para quando não tinver permissão para um determinado comando na loteria
+  sem-permissao: 'Você não tem permissão para executar esse comando'
+
+  # Define mensagem quando não houver ganhardor.
+  sem-ganhador: '&fEvento encerrado, não houve ganhador'
+
+#    ____             __ _
+#   / ___|___  _ __  / _(_) __ _
+#  | |   / _ \| '_ \| |_| |/ _` |
+#  | |__| (_) | | | |  _| | (_| |
+#   \____\___/|_| |_|_| |_|\__, |
+#                          |___/
+
+config:
+
+  # Define por quanto tempo a loteria vai ficar ativa enquanto não houve ganhador.
+  # - Caso houver ganhador a loteria vai encerrar automaticamente.
+  tempo-loteria: 100

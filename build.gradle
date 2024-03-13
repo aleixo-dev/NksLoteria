@@ -18,11 +18,16 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    compileOnly "org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT"
+    compileOnly("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compileOnly("com.github.MilkBowl:VaultAPI:1.7")
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
 
 def targetJavaVersion = 16
@@ -54,8 +59,8 @@ kotlin {
 }
 
 shadowJar {
-    destinationDirectory.set(file("C:/Users/Nicolas/Desktop/SERVIDOR/SERVIDOR_1_17_1/plugins"))
-    archiveBaseName.set('NKLoteria')
+    destinationDirectory.set(file("C:/Users/Nicolas/Desktop/SERVIDOR/SERVIDOR_PAPER/plugins"))
+    archiveBaseName.set('NksLoteria')
     archiveClassifier.set('')
     archiveVersion.set('')
 }
