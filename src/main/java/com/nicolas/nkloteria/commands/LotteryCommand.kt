@@ -6,6 +6,7 @@ import com.nicolas.nkloteria.instance.Lottery
 import com.nicolas.nkloteria.utils.*
 import net.milkbowl.vault.economy.Economy
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -30,14 +31,14 @@ class LotteryCommand(
         if (economy == null) return true
         val player: Player = sender
 
-        if (args.isEmpty() && player.hasPermissionAdmin()) {
+        if (args.isEmpty() && player.hasPermission("nks.loteria.admin")) {
             LotteryMessages.showHelpCommand().lines().forEach {
                 player.sendMessage(it)
             }
             return true
         }
 
-        if (player.hasPermissionAdmin()) {
+        if (player.hasPermission("nks.loteria.admin")) {
             if (args.size == 3 && args[0].equals("iniciar", true)) {
 
                 if (!args[1].isNumeric() || (!rewardUtil.isValidMagnitudeMap((args[2])) || args[2].isBlank())) {
@@ -70,58 +71,92 @@ class LotteryCommand(
                          */
                         lottery = Lottery(plugin, plugin.lotteryQuantity[LOTTERY_EVENT_QUANTITY] ?: "")
                         lottery?.start()
+                        return true
                     }
 
                 } else {
-                    player.sendMessage("§eUm número já foi sorteado, espere até encerrar!")
+                    player.sendMessage("${plugin.config.getString("mensagens.admin.numero-ja-sorteado")}")
+                    return true
                 }
 
             } else if (args.size == 1 && args[0].equals("sorteio", true)) {
 
                 if (hasLotteryStarted()) {
-                    player.sendMessage("| §eSorteio ativo:")
-                    player.sendMessage("| §eNúmero da loteria: §7§l${plugin.lotteryNumber[LOTTERY_EVENT_KEY] ?: 0}")
+
+                    val message = plugin.config.getStringList("mensagens.sorteio").map { line ->
+                        line.replace("{numero_loteria}", plugin.lotteryNumber[LOTTERY_EVENT_KEY].toString())
+                    }
+
+                    message.forEach { player.sendMessage(ChatColor.translateAlternateColorCodes('&', it)) }
+
+                    return true
+
                 } else {
-                    player.sendMessage("§eNão existe sorteio ativo.")
+                    player.sendMessage("${plugin.config.getString("mensagens.nenhum-sorteio-ativo")}")
+                    return true
                 }
 
-            } else if (args.size == 1 && args[0].equals("encerrar", true) && player.hasPermission("niks.loteria.*")) {
+            } else if (args.size == 1 && args[0].equals("encerrar", true)) {
 
                 if (hasLotteryStarted()) {
                     lottery?.reset()
-                    player.sendMessage("§eVocê acabou de encerrar um sorteio.")
+                    player.sendMessage("${plugin.config.getString("mensagens.admin.sorteio-encerrar")}")
+                    return true
                 } else {
-                    player.sendMessage("§eNão possui um sorteio ativo")
+                    player.sendMessage("${plugin.config.getString("mensagens.nenhum-sorteio-ativo")}")
+                    return true
                 }
-            } else {
-                player.sendMessage("${LotteryMessages.pluginTag()}§7Tente usar /loteria iniciar (número) (prêmio)")
+            }
+        }
+        if (player.hasPermission("nks.apostar")) {
+
+            if (!hasLotteryStarted()) {
+                player.sendMessage(" ")
+                player.sendMessage("${plugin.config.getString("mensagens.nenhum-sorteio-ativo")}")
+                player.sendMessage(" ")
                 return true
             }
 
-        } else if (args.size == 1 && player.hasPermissionBet()) {
+            if (args.size == 1 && args[0].isNumeric()) {
 
-            if (!args[0].isNumeric()) {
-                player.sendMessage("§eVocê pode apostar apenas número!")
-                return false
-            }
+                if (plugin.config.getBoolean("saque.habilitar")) {
 
-            if (!hasLotteryStarted()) {
-                player.sendMessage("§eO sorteio da loteria não está disponível no momento!")
-                return false
-            }
+                    if (RewardUtil(plugin).endsWithMagnitude(
+                            plugin.config.getString("saque.valor").isNullOrBlank().toString()
+                        )
+                    ) {
+                        return true
+                    }
 
-            if (args[0].toInt() == plugin.lotteryNumber[LOTTERY_EVENT_KEY]) {
-                economy.depositPlayer(player, lotteryRewardQuantity)
+                    val withdrawValue = RewardUtil(plugin).parseReward(plugin.config.getString("saque.valor")!!)
 
-                Bukkit.getPluginManager()
-                    .callEvent(LotteryEventGuess(player, plugin.lotteryQuantity[LOTTERY_EVENT_QUANTITY] ?: ""))
-                lottery?.reset()
-                lotteryRewardQuantity = 0.0
+                    val response = economy.withdrawPlayer(player, withdrawValue)
+                    if (response.transactionSuccess()) {
+                        player.sendMessage(String.format("Foi cobrado de você %s", economy.format(response.amount)))
+                    } else {
+                        player.sendMessage("Você não possui dinheiro suficiente para fazer isto!")
+                        return true
+                    }
+                }
+
+                if (args[0].toInt() == plugin.lotteryNumber[LOTTERY_EVENT_KEY]) {
+                    economy.depositPlayer(player, lotteryRewardQuantity)
+
+                    Bukkit.getPluginManager()
+                        .callEvent(LotteryEventGuess(player, plugin.lotteryQuantity[LOTTERY_EVENT_QUANTITY] ?: ""))
+                    lottery?.reset()
+                    lotteryRewardQuantity = 0.0
+                    return true
+                } else {
+                    player.sendMessage("${plugin.config.getString("mensagens.jogador.tentativa")}")
+                    return true
+                }
             } else {
-                player.sendMessage("§eQue pena! você errou.")
+                player.sendMessage("${plugin.config.getString("mensagens.jogador.erro-na-aposta")}")
             }
         } else {
-            LotteryMessages.messageErrorPermission(player)
+            player.sendMessage("${plugin.config.getString("mensagens.jogador.sem-permissao")}")
+            return true
         }
 
         return true
